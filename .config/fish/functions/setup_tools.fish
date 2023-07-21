@@ -4,7 +4,8 @@ function setup_tools
 
   set -l tools $HOME/tools
   fish_add_path -g $tools/bin
-  fish_add_path -g $tools/nvim/bin
+  fish_add_path -g $tools/vim/bin
+  # fish_add_path -g $tools/nvim/bin
   fish_add_path -g $tools/node/bin
   fish_add_path -g $tools/google-cloud-sdk/bin
 

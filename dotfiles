@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+: "${VIM_VERSION:="v9.0.1426"}"
+
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 help() {
@@ -62,6 +64,10 @@ bootstrap_ubuntu() {
     xsel
     finger
     shellcheck
+    # https://github.com/vim/vim/blob/master/src/INSTALL
+    clang
+    libtool-bin
+    libxt-dev
   )
   local missing_packages=()
   for package in "${packages[@]}"; do
@@ -222,6 +228,31 @@ setup_git() {
 }
 
 setup_vim() {
+  local vim_source_dir=~/tools/sources/vim
+  local vim_dir=~/tools/vim
+
+  if test -e "$vim_source_dir"; then
+    echo "info: $vim_source_dir exists. skip."
+  else
+    echo "info: clone vim source."
+    mkdir -p ~/tools/sources
+    git clone --depth 1 --branch "$VIM_VERSION" https://github.com/vim/vim "$vim_source_dir"
+  fi
+
+  if test -e "$vim_dir"; then
+    echo "info: $vim_dir exists. skip."
+  else
+    echo "info: build vim.";
+    (
+      set -eu;
+      cd "$vim_source_dir/src";
+      make distclean || true;
+      ./configure --prefix="$vim_dir"
+      make;
+      make install;
+    )
+  fi
+
   if test -e ~/.vim/autoload/plug.vim; then
     echo "skip: vim-plug exists."
   else
